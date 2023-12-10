@@ -9,7 +9,7 @@ export const requireSignIn = (req, res, next) => {
     }
     catch(error){
         console.log(error);
-        res.send({
+        return res.send({
             success: false,
             error,
             message: "Error in Token Middleware"
@@ -30,7 +30,7 @@ export const isAdmin = async(req, res, next) => {
     }
     catch(error) {
         console.log(error);
-        res.send({
+        return res.send({
             success: false,
             error,
             message: "Error in Admin Middleware"

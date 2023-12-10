@@ -1,5 +1,5 @@
 import express from 'express'
-import { createProductController, getProductController, getSingleProductController, productPhotoController, deleteProductController, updateProductController } from '../controllers/productController.js'
+import { createProductController, getProductController, getSingleProductController, productPhotoController, deleteProductController, updateProductController, filteredProductController } from '../controllers/productController.js'
 import {requireSignIn, isAdmin} from '../middlewares/authMiddleware.js'
 import formidable from 'express-formidable'
 
@@ -19,5 +19,7 @@ router.get('/product-photo/:pid', productPhotoController);
 router.delete('/delete-product/:pid', requireSignIn, isAdmin, deleteProductController);
 // Update Product:
 router.put('/update-product/:pid', requireSignIn, isAdmin, formidable(), updateProductController);
+// Filtered Products:
+router.get('/get-filtered-products', filteredProductController);
 
 

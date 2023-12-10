@@ -2,6 +2,8 @@ import userModel from '../models/userModel.js'
 import validator from 'validator'
 import {hashPassword, comparePassword} from '../helpers/authHelper.js'
 import JWT from 'jsonwebtoken'
+import fs from 'fs'
+
 
 export const registerController = async(req, res) => {
     try{
@@ -79,6 +81,69 @@ export const loginUser = async(req, res) => {
     })
 }
 
-export const testController = (req, res) => {
-    return res.send("This is a protected Route!");
+export const getUserController = async(req, res) => {
+    try{
+        const {id} = req.params;
+        const user = await userModel.findById(id);
+        if (user){
+            return res.status(200).send({
+                user, message: "Retrieved", success: true
+            });
+        }
+        else return res.status(200).send({user: null,  message: "Retrieved"});
+    }
+    catch(error){
+        return res.status(500).send({
+            message: "Internal Server Error"
+        });
+    }
 }
+
+export const userPhotoController = async(req, res) => {
+    try{
+        const {id} = req.params;
+        const user = await userModel.findById(id).select("photo");
+        if (user.photo.data){
+            console.log("yes");
+            res.set("Content-type", user.photo.contentType);
+            return res.status(200).send(user.photo.data);
+        }
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).send({
+            success: false,
+            message: "Error while getting Photo",
+            error
+        })
+    }
+}
+
+export const userProfileController = async (req, res) => {
+    try{
+        const {id} = req.fields;
+        const {photo} = req.files;
+        // Validation:
+        if (photo && photo.size > 1000000){
+            return res.status(500).send({error: 'Photo Required should be less than 1Mb!'}); 
+        }   
+        if (photo){
+            const data = fs.readFileSync(photo.path);
+            const ct = photo.type;
+            const user = await userModel.findByIdAndUpdate(id, {photo: {data: data,contentType: ct}}, {new: true});
+        }
+        return res.status(201).send({
+            success: true,
+            message: 'Applied Successfully'
+        });
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).send({
+            success: false,
+            error,
+            message: 'Error in Saving Profile Picture'
+        });
+    }
+}
+

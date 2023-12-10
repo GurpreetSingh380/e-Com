@@ -23,10 +23,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    photo: {
+        data: {type: Buffer, default: Buffer.alloc(0)},
+        contentType: {type: String, default: null}
+    },
     role: {
         type: Number,
         default: 0
     }
-}, {timestamps: true})
+}, {timestamps: true});
 
 export default mongoose.model('users', userSchema);
